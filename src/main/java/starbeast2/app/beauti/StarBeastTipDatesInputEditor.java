@@ -27,6 +27,8 @@ import java.util.*;
 
 public class StarBeastTipDatesInputEditor extends BEASTObjectInputEditor {
 
+    public StarBeastTipDatesInputEditor() { super(); }
+
     public StarBeastTipDatesInputEditor(BeautiDoc doc) {
         super(doc);
     }

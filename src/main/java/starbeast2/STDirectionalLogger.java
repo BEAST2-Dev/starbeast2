@@ -76,7 +76,7 @@ public class STDirectionalLogger extends Tree implements Loggable {
         List<Function> metadata = parameterInput.get();
         for (int i = 0; i < metadata.size(); i++) {
         	if (metadata.get(i) instanceof StateNode) {
-        		metadata.set(i, ((StateNode) metadata.get(i)).getCurrent());
+        		metadata.set(i, (Function) ((StateNode) metadata.get(i)).getCurrent());
         	}
         }
         BranchRateModel.Base branchRateModel = clockModelInput.get();

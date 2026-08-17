@@ -4,7 +4,7 @@ import beast.base.core.Input;
 import beast.base.evolution.tree.Tree;
 import beast.base.inference.Runnable;
 import beast.base.parser.NexusParser;
-import sa.app.tools.SATreeTraceAnalysis;
+import sa.app.tools.fx.SATreeTraceAnalysis;
 
 import java.io.File;
 import java.io.PrintStream;

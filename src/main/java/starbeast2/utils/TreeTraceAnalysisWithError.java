@@ -1,6 +1,6 @@
 package starbeast2.utils;
 
-import sa.app.tools.SATreeTraceAnalysis;
+import sa.app.tools.fx.SATreeTraceAnalysis;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
