@@ -4,7 +4,7 @@ import beast.base.core.Description;
 import beast.base.core.Function;
 import beast.base.core.Input;
 import beast.base.core.Loggable;
-import beast.base.evolution.branchratemodel.BranchRateModel;
+import beast.base.spec.evolution.branchratemodel.Base;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
 import beast.base.inference.StateNode;
@@ -22,7 +22,7 @@ import java.util.List;
 @Description("log trees that also contain the node state probabilities")
 public class SpeciesTreeLoggerWithGeneFlow extends Tree implements Loggable {
     public Input<ConstantWithGeneFlow> popModelInput = new Input<>("populationModel", "Population model used to infer the multispecies coalescent probability for this gene");
-    public Input<BranchRateModel.Base> clockModelInput = new Input<BranchRateModel.Base>("branchratemodel", "rate to be logged with branches of the tree");
+    public Input<Base> clockModelInput = new Input<Base>("branchratemodel", "rate to be logged with branches of the tree");
     public Input<List<Function>> parameterInput = new Input<List<Function>>("metadata", "meta data to be logged with the tree nodes",new ArrayList<>());
     public Input<Boolean> substitutionsInput = new Input<Boolean>("substitutions", "report branch lengths as substitutions (branch length times clock rate for the branch)", false);
     public Input<Integer> decimalPlacesInput = new Input<Integer>("dp", "the number of decimal places to use writing branch lengths and rates, use -1 for full precision (default = full precision)", -1);
@@ -78,7 +78,7 @@ public class SpeciesTreeLoggerWithGeneFlow extends Tree implements Loggable {
         		metadata.set(i, (Function) ((StateNode) metadata.get(i)).getCurrent());
         	}
         }
-        BranchRateModel.Base branchRateModel = clockModelInput.get();
+        Base branchRateModel = clockModelInput.get();
         // write out the log tree with meta data
         out.print("tree STATE_" + nSample + " = ");
 //        tree.getRoot().sort();
@@ -103,7 +103,7 @@ public class SpeciesTreeLoggerWithGeneFlow extends Tree implements Loggable {
         }
     }
 
-    String toNewick(Node node, List<Function> metadataList, BranchRateModel.Base branchRateModel) {
+    String toNewick(Node node, List<Function> metadataList, Base branchRateModel) {
 
     	StringBuffer buf = new StringBuffer();
         if (node.getLeft() != null) {

@@ -1,8 +1,7 @@
 package starbeast2.app.beauti;
 
 import beast.base.core.BEASTInterface;
-import beast.base.inference.operator.DeltaExchangeOperator;
-import beast.base.inference.operator.kernel.BactrianDeltaExchangeOperator;
+import beast.base.spec.inference.operator.DeltaExchangeOperator;
 import beastfx.app.inputeditor.BeautiAlignmentProvider;
 import beastfx.app.inputeditor.BeautiDoc;
 
@@ -21,9 +20,9 @@ public class StarBeastAlignmentProvider extends BeautiAlignmentProvider {
 
 		System.out.println(String.format("N_ALIGNMENTS = %d", doc.alignments.size()));
 		// initialize delta exchange operator in order to increase weight to something more sensible
-		BactrianDeltaExchangeOperator operator = (BactrianDeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
+		DeltaExchangeOperator operator = (DeltaExchangeOperator) doc.pluginmap.get("FixMeanMutationRatesOperator");
 		if (operator == null) {
-			operator = new BactrianDeltaExchangeOperator();
+			operator = new DeltaExchangeOperator();
 			try {
 				operator.setID("FixMeanMutationRatesOperator");
 				operator.initByName("weight", (double) alignmentCount, "delta", 0.75);

@@ -7,7 +7,8 @@ import beast.base.evolution.alignment.TaxonSet;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
 import beast.base.inference.Operator;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.util.Randomizer;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class NodeReheight2 extends Operator {
     public final Input<TaxonSet> taxonSetInput = new Input<>("taxonset", "taxon set describing species tree taxa and their gene trees", Validate.REQUIRED); // left for compatibility with previous StarBEAST2 versions
     public final Input<List<GeneTree>> geneTreesInput = new Input<>("geneTree", "list of gene trees that constrain species tree movement", new ArrayList<>());
     public final Input<Double> windowInput = new Input<>("window", "size of the random walk window", 10.0);
-    public final Input<RealParameter> originInput = new Input<RealParameter>("origin", "The time when the process started", (RealParameter) null);
+    public final Input<RealScalarParam<PositiveReal>> originInput = new Input<>("origin", "The time when the process started", (RealScalarParam<PositiveReal>) null);
 
     private enum RelativePosition {LEFT, RIGHT, BOTH}
 
@@ -149,7 +150,7 @@ public class NodeReheight2 extends Operator {
 
     private void recalculateMaxHeight(final int centerIndex) {
         if (originSpecified) {
-            maxHeight = originInput.get().getValue();
+            maxHeight = originInput.get().get();
         } else {
             maxHeight = Double.POSITIVE_INFINITY;
         }

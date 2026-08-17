@@ -5,7 +5,8 @@ import beast.base.core.Input;
 import beast.base.core.Input.Validate;
 import beast.base.evolution.tree.Node;
 import beast.base.inference.CalculationNode;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.inference.parameter.RealVectorParam;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -16,7 +17,7 @@ import java.util.Arrays;
 
 public class ConstantPopulations extends CalculationNode implements PopulationModel {
     public Input<SpeciesTreeInterface> speciesTreeInput = new Input<>("speciesTree", "The species tree this model applies to.", Validate.REQUIRED);
-    public Input<RealParameter> popSizesInput = new Input<RealParameter>("populationSizes", "Constant per-branch population sizes.", Validate.REQUIRED);
+    public Input<RealVectorParam<PositiveReal>> popSizesInput = new Input<>("populationSizes", "Constant per-branch population sizes.", Validate.REQUIRED);
 
     private SpeciesTreeInterface speciesTree;
 
@@ -41,8 +42,8 @@ public class ConstantPopulations extends CalculationNode implements PopulationMo
 
     @Override
     public double branchLogP(int speciesTreeNodeNumber, Node speciesTreeNode, double ploidy, double[] branchCoalescentTimes, int branchLineageCount, int branchEventCount) {
-        final RealParameter popSizes = popSizesInput.get();
-        final double popSize = popSizes.getValue(speciesTreeNodeNumber);
+        final RealVectorParam<PositiveReal> popSizes = popSizesInput.get();
+        final double popSize = popSizes.get(speciesTreeNodeNumber);
         double logP = constantLogP(popSize, ploidy, branchCoalescentTimes, branchLineageCount, branchEventCount);
 
         return logP;
@@ -50,22 +51,22 @@ public class ConstantPopulations extends CalculationNode implements PopulationMo
 
     @Override
     public void initPopSizes(double popInitial) {
-        final RealParameter popSizes = popSizesInput.get();
+        final RealVectorParam<PositiveReal> popSizes = popSizesInput.get();
         final double lower = popSizes.getLower();
         final double upper = popSizes.getUpper();
 
         if (popSizes.isEstimatedInput.get() && popInitial > lower && popInitial < upper) {
-	        for (int i = 0; i < popSizes.getDimension(); i++) {
-	            popSizes.setValue(i, popInitial);
+	        for (int i = 0; i < popSizes.size(); i++) {
+	            popSizes.set(i, popInitial);
 	        }
         }
     }
 
     @Override
     public void serialize(Node speciesTreeNode, StringBuffer buf, DecimalFormat df) {
-        final RealParameter popSizes = popSizesInput.get();
+        final RealVectorParam<PositiveReal> popSizes = popSizesInput.get();
         final int speciesTreeNodeNumber = speciesTreeNode.getNr();
-        final double branchPopSize = popSizes.getValue(speciesTreeNodeNumber);
+        final double branchPopSize = popSizes.get(speciesTreeNodeNumber);
 
         buf.append("dmv={");
         if (df == null) {
@@ -79,7 +80,7 @@ public class ConstantPopulations extends CalculationNode implements PopulationMo
     @Override
     public boolean isDirtyBranch(Node speciesNode) {
         if (needsUpdate) {
-            final RealParameter popSizes = popSizesInput.get();
+            final RealVectorParam<PositiveReal> popSizes = popSizesInput.get();
 
             Arrays.fill(speciesBranchStatus, false);
 

@@ -2,14 +2,15 @@ package starbeast2;
 
 import beast.base.core.Input;
 import beast.base.evolution.tree.Node;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.type.RealScalar;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AllEqual extends MigrationModel {	
+public class AllEqual extends MigrationModel {
 
-    public Input<RealParameter> effectiveMigrantsInput  = new Input<>("effectiveMigrants","absolute migration rates",Input.Validate.OPTIONAL);
+    public Input<RealScalar<PositiveReal>> effectiveMigrantsInput  = new Input<>("effectiveMigrants","absolute migration rates",Input.Validate.OPTIONAL);
 
     public Input<String> excludeInput = new Input<>("exclude", "nodes with no migration");
 
@@ -71,7 +72,7 @@ public class AllEqual extends MigrationModel {
 		if (effectiveMigrantsInput.get()==null)
 			return 1.0;
 		else
-			return effectiveMigrantsInput.get().getValue(); 		
+			return effectiveMigrantsInput.get().get(); 		
 	}
 
 	@Override
@@ -79,7 +80,7 @@ public class AllEqual extends MigrationModel {
 		if (effectiveMigrantsInput.get()==null)
 			return 1.0;
 		else
-			return effectiveMigrantsInput.get().getValue();
+			return effectiveMigrantsInput.get().get();
 	}	
 		
 }

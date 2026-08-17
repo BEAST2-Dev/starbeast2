@@ -6,12 +6,17 @@ import beast.base.evolution.alignment.Taxon;
 import beast.base.evolution.alignment.TaxonSet;
 import beast.base.evolution.distance.Distance;
 import beast.base.evolution.distance.JukesCantorDistance;
-import beast.base.evolution.tree.*;
-import beast.base.evolution.tree.coalescent.ConstantPopulation;
-import beast.base.evolution.tree.coalescent.RandomTree;
+import beast.base.evolution.tree.Node;
+import beast.base.evolution.tree.Tree;
+import beast.base.evolution.tree.TreeParser;
 import beast.base.inference.StateNode;
 import beast.base.inference.StateNodeInitialiser;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.evolution.tree.ClusterTree;
+import beast.base.spec.evolution.tree.MRCAPrior;
+import beast.base.spec.evolution.tree.coalescent.ConstantPopulation;
+import beast.base.spec.evolution.tree.coalescent.RandomTree;
+import beast.base.spec.inference.parameter.RealScalarParam;
 
 import java.util.*;
 
@@ -49,7 +54,7 @@ public class StarBeastInitializer extends Tree implements StateNodeInitialiser {
 
     final public Input<List<Tree>> genes = new Input<>("geneTree", "Gene trees to initialize", new ArrayList<>());
 
-    final public Input<RealParameter> birthRate = new Input<>("birthRate",
+    final public Input<RealScalarParam<PositiveReal>> birthRate = new Input<>("birthRate",
             "Tree prior birth rate to initialize");
 
     final public Input<Function> muInput = new Input<>("baseRate",
@@ -398,25 +403,23 @@ public class StarBeastInitializer extends Tree implements StateNodeInitialiser {
             }
         }
 
-        final RealParameter lambda = birthRate.get();
-        if (lambda != null && lambda instanceof StateNode) {
-            final StateNode lambdaStateNode = (StateNode) lambda;
-
+        final RealScalarParam<PositiveReal> lambda = birthRate.get();
+        if (lambda != null) {
             // only change lambda if it is to be estimated
-            if (lambdaStateNode.isEstimatedInput.get()) {
+            if (lambda.isEstimatedInput.get()) {
                 final double rh = speciesTree.getRoot().getHeight();
                 double l = 0;
                 for(int i = 2; i < speciesCount+1; ++i) l += 1./i;
-                lambda.setValue((1 / rh) * l);
+                lambda.set((1 / rh) * l);
             }
         }
     }
 
     private void randomInit(final SpeciesTree speciesTree, List<MRCAPrior> calibrations) {
-    	final RealParameter birthRateParameter = birthRate.get();
-    	final Double lambda = (birthRateParameter == null) ? 1.0 : birthRateParameter.getValue();
+    	final RealScalarParam<PositiveReal> birthRateParameter = birthRate.get();
+    	final Double lambda = (birthRateParameter == null) ? 1.0 : birthRateParameter.get();
     	final Double initialPopSize = 1.0 / lambda; // scales coalescent tree height inverse to birth rate
-    	final RealParameter popSize = new RealParameter(initialPopSize.toString());
+    	final RealScalarParam<PositiveReal> popSize = new RealScalarParam<>(initialPopSize, PositiveReal.INSTANCE);
         final ConstantPopulation pf = new ConstantPopulation();
         pf.setInputValue("popSize", popSize);
 
@@ -504,7 +507,7 @@ public class StarBeastInitializer extends Tree implements StateNodeInitialiser {
             stateNodes.add(g);
         }
 
-        final RealParameter brate = birthRate.get();
+        final RealScalarParam<PositiveReal> brate = birthRate.get();
         if (brate != null) {
             stateNodes.add(brate) ;
         }

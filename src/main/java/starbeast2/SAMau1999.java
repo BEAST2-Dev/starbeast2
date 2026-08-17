@@ -6,7 +6,8 @@ import beast.base.core.Input.Validate;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
 import beast.base.inference.Operator;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.util.Randomizer;
 
 
@@ -19,7 +20,7 @@ import beast.base.util.Randomizer;
 public class SAMau1999 extends Operator {
     public final Input<Tree> treeInput = new Input<>("tree", "the species tree", Validate.REQUIRED);
     public final Input<Double> windowInput = new Input<>("window", "size of the random walk window", 10.0);
-    public final Input<RealParameter> originInput = new Input<RealParameter>("origin", "The time when the process started", (RealParameter) null);
+    public final Input<RealScalarParam<PositiveReal>> originInput = new Input<>("origin", "The time when the process started", (RealScalarParam<PositiveReal>) null);
 
     private int nextIndex;
     private int nodeCount;
@@ -80,7 +81,7 @@ public class SAMau1999 extends Operator {
 
         double maxHeight;
         if (originSpecified) {
-            maxHeight = originInput.get().getValue();
+            maxHeight = originInput.get().get();
         } else {
             maxHeight = Double.POSITIVE_INFINITY;
         }

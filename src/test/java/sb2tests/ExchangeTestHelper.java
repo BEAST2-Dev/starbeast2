@@ -5,7 +5,8 @@ import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeParser;
 import beast.base.inference.State;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.inference.parameter.RealVectorParam;
 import org.junit.Test;
 import starbeast2.*;
 
@@ -23,7 +24,7 @@ abstract class ExchangeTestHelper {
     SpeciesTreeParser speciesTreeWrapper;
     List<GeneTree> geneTreeWrappers = new ArrayList<>();
 
-    RealParameter popsizeParameter;
+    RealVectorParam<PositiveReal> popsizeParameter;
     ConstantPopulations populationModel;
     MultispeciesCoalescent msc;
 
@@ -45,8 +46,7 @@ abstract class ExchangeTestHelper {
         initializeSpeciesTree(speciesSuperSet);
         initializeGeneTrees();
 
-        popsizeParameter = new RealParameter();
-        popsizeParameter.initByName("value", String.valueOf(popSize));
+        popsizeParameter = new RealVectorParam<>(new double[]{popSize}, PositiveReal.INSTANCE);
 
         // Create dummy state to allow statenode editing
         State state = new State();

@@ -21,8 +21,11 @@ import beast.base.core.Description;
 import beast.base.core.Input;
 import beast.base.evolution.tree.Node;
 import beast.base.inference.CalculationNode;
-import beast.base.inference.parameter.BooleanParameter;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.NonNegativeReal;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.inference.parameter.BoolVectorParam;
+import beast.base.spec.inference.parameter.RealScalarParam;
+import beast.base.spec.inference.parameter.RealVectorParam;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -34,10 +37,10 @@ import java.util.*;
 @Description("Species tree that contains the information about things such as the speciation times and migration rates")
 @Citation("Nicola F. Müller, Huw A. Ogilvie, Chi Zhang, Alexei J. Drummond and Tanja Stadler(2018)\n  Inference of species histories in the presence of gene flow.\n  bioRxiv doi: 10.1101/348391")
 public class ConstantWithGeneFlow extends CalculationNode implements PopulationModel {
-    public Input<RealParameter> NeInput = new Input<RealParameter>("Ne","contains the Ne of each branch",Input.Validate.REQUIRED);   
-    public Input<RealParameter> NeMeanInput = new Input<RealParameter>("NeMean","contains the Ne of each branch",Input.Validate.OPTIONAL);   
-    public Input<RealParameter> mInput  = new Input<>("m","relative migration rates between branches",Input.Validate.REQUIRED);
-    public Input<BooleanParameter> indicatorInput  = new Input<>("indicator","indicator if rate is not 0");
+    public Input<RealVectorParam<PositiveReal>> NeInput = new Input<>("Ne","contains the Ne of each branch",Input.Validate.REQUIRED);
+    public Input<RealScalarParam<PositiveReal>> NeMeanInput = new Input<>("NeMean","contains the Ne of each branch",Input.Validate.OPTIONAL);
+    public Input<RealVectorParam<NonNegativeReal>> mInput  = new Input<>("m","relative migration rates between branches",Input.Validate.REQUIRED);
+    public Input<BoolVectorParam> indicatorInput  = new Input<>("indicator","indicator if rate is not 0");
     public Input<MigrationModel> migrationModelInput  = new Input<>("migrationModel","input of model of migration",Input.Validate.REQUIRED);
     public Input<MigrationModel> maxMigrationModelInput  = new Input<>("maxMigrationRateModel","input of model of migration");
     public Input<Boolean> rateIsForwardInput  = new Input<>("rateIsForward","input of direction of migration",false);
@@ -203,14 +206,14 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
     					for (int c = 0; c < migrationMap.size(); c++){
     						if (migrationMap.get(c)[0]==activeStates.get(a)
     								&& migrationMap.get(c)[1]==par_lin){
-    							if(indicatorInput.get().getArrayValue(c) > 0.5)
+    							if(indicatorInput.get().get(c))
     								new_isConnected[a][activeStates.size()] = true;
     						}
     					}
     					for (int c = 0; c < migrationMap.size(); c++){
     						if (migrationMap.get(c)[0]==par_lin
     								&& migrationMap.get(c)[1]==activeStates.get(a)){
-    							if(indicatorInput.get().getArrayValue(c) > 0.5)
+    							if(indicatorInput.get().get(c))
     								new_isConnected[activeStates.size()][a] = true;
     						}
     					}
@@ -252,7 +255,7 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
 					for (int c = 0; c < migrationMap.size(); c++){
 						if (migrationMap.get(c)[0]==activeStates.get(a)
 								&& migrationMap.get(c)[1]==activeStates.get(b)){
-							if(indicatorInput.get().getArrayValue(c) > 0.5){
+							if(indicatorInput.get().get(c)){
 								isConnected[a][b] = true;
 							}
 						}
@@ -442,7 +445,7 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
 	        	for (int a = 0; a < mRateMapping.length; a++){
 	    			for (int b = 0; b < mRateMapping.length; b++){
 	    				if (a!=b){
-		    				if(indicatorInput.get().getArrayValue(mRateMapping[a][b]) > 0.5){
+		    				if(indicatorInput.get().get(mRateMapping[a][b])){
 		    					Integer[] add={a,b};
 		    					indicatorList.add(add);
 		    				}
@@ -461,7 +464,7 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
 	    			int x_c = indicators_array.getValue(a, 0);
 	    			int y_c = indicators_array.getValue(a, 1);
 	    			migration_array.setValue(x_c, y_c, migModel.getMigration(stateToNodeMap.get(i).get(x_c) , stateToNodeMap.get(i).get(y_c))
-	    					* mInput.get().getArrayValue(mRateMapping[x_c][y_c]));
+	    					* mInput.get().get(mRateMapping[x_c][y_c]));
 	    		}
 	    		migrationRates.add(migration_array);
 	    				
@@ -471,7 +474,7 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
 	    			for (int b = 0; b < mRateMapping.length; b++){
 	    				if (a!=b){
 	    					migration_array.setValue(a, b, migModel.getMigration(stateToNodeMap.get(i).get(a) , stateToNodeMap.get(i).get(b))
-	    							* mInput.get().getArrayValue(mRateMapping[a][b]));
+	    							* mInput.get().get(mRateMapping[a][b]));
 	    				}
 	    			}
 	    		}    
@@ -508,10 +511,10 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
     		calculateIntervals();
     	
     	if (NeMeanInput.get()!=null)
-    		return NeMeanInput.get().getValue()*NeInput.get().getArrayValue(
+    		return NeMeanInput.get().get()*NeInput.get().get(
         			stateToNodeMap.get(currentInterval-getNumberOfSpecies()).get(state));
     	else
-    		return NeInput.get().getArrayValue(
+    		return NeInput.get().get(
     			stateToNodeMap.get(currentInterval-getNumberOfSpecies()).get(state));
     }
     
@@ -572,9 +575,9 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
     		calculateIntervals();
 
 		int interval = currentInterval-getNumberOfSpecies();
-//		double Nesink = NeInput.get().getArrayValue(
+//		double Nesink = NeInput.get().get(
 //    			stateToNodeMap.get(currentInterval-getNumberOfSpecies()).get(state1));
-//		double Nesource = NeInput.get().getArrayValue(
+//		double Nesource = NeInput.get().get(
 //    			stateToNodeMap.get(currentInterval-getNumberOfSpecies()).get(state2));
 		
 		double migration = migModel.getMigration(stateToNodeMap.get(interval).get(state1) , stateToNodeMap.get(interval).get(state2));
@@ -584,12 +587,12 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
 			if (migrationMap.get(i)[0]==stateToNodeMap.get(interval).get(state1) 
 					&& migrationMap.get(i)[1]==stateToNodeMap.get(interval).get(state2)){
 					if (indicatorInput.get()!=null){
-						if(indicatorInput.get().getArrayValue(i) > 0.5)
-							return migration*mInput.get().getArrayValue(i);
+						if(indicatorInput.get().get(i))
+							return migration*mInput.get().get(i);
 						else
 							return 0.0;
 					}else{
-						return migration*mInput.get().getArrayValue(i);						
+						return migration*mInput.get().get(i);						
 					}
 			}
 		}
@@ -607,10 +610,10 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
 			if (migrationMap.get(i)[0]==node1 
 					&& migrationMap.get(i)[1]==node2){
 				if (!rateIsForwardInput.get()){
-					double NeRatio = NeInput.get().getArrayValue(node2)/NeInput.get().getArrayValue(node1);
-					return migration*mInput.get().getArrayValue(i) * NeRatio;
+					double NeRatio = NeInput.get().get(node2)/NeInput.get().get(node1);
+					return migration*mInput.get().get(i) * NeRatio;
 				}else{
-					return migration*mInput.get().getArrayValue(i);
+					return migration*mInput.get().get(i);
 				}
 			}
 		}
@@ -655,13 +658,13 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
 								if (migrationMap.get(l)[0]==stateToNodeMap.get(i).get(j) 
 										&& migrationMap.get(l)[1]==stateToNodeMap.get(i).get(k)){
 										if (indicatorInput.get()!=null){
-											if (indicatorInput.get().getArrayValue(l) > 0.5){
-												migration*=mInput.get().getArrayValue(l);											
+											if (indicatorInput.get().get(l)){
+												migration*=mInput.get().get(l);											
 											}else{
 												migration*=0.0;											
 											}											
 										}else{
-											migration*=mInput.get().getArrayValue(l);
+											migration*=mInput.get().get(l);
 										}
 								}
 							}
@@ -709,13 +712,13 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
 								if (migrationMap.get(l)[0]==stateToNodeMap.get(i).get(j) 
 										&& migrationMap.get(l)[1]==stateToNodeMap.get(i).get(k)){
 										if (indicatorInput.get()!=null){
-											if (indicatorInput.get().getArrayValue(l) > 0.5){
-												migration=mInput.get().getArrayValue(l)*migModel.getEM();											
+											if (indicatorInput.get().get(l)){
+												migration=mInput.get().get(l)*migModel.getEM();											
 											}else{
 												migration*=0.0;											
 											}											
 										}else{
-											migration=mInput.get().getArrayValue(l)*migModel.getEM();
+											migration=mInput.get().get(l)*migModel.getEM();
 										}
 								}
 							}
@@ -877,9 +880,9 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
     
 	public double getNodeNe(int nr) {
 		if (NeMeanInput.get()!=null)
-			return NeMeanInput.get().getValue()*NeInput.get().getArrayValue(nr);
+			return NeMeanInput.get().get()*NeInput.get().get(nr);
 		else
-			return NeInput.get().getArrayValue(nr);
+			return NeInput.get().get(nr);
 	}
      
 	protected int getSpeciesState(int currentInterval, int state){
@@ -1124,7 +1127,7 @@ public class ConstantWithGeneFlow extends CalculationNode implements PopulationM
     			for (int b = 0; b < mRateMapping.length; b++){
     				if (a!=b){
     					double migRate = migModel.getMigration(stateToNodeMap.get(i).get(a) , stateToNodeMap.get(i).get(b))
-    							* mInput.get().getArrayValue(mRateMapping[a][b]);
+    							* mInput.get().get(mRateMapping[a][b]);
     					double maxMigRate = maxMigRatesModel.getMigration(stateToNodeMap.get(i).get(a) , stateToNodeMap.get(i).get(b));
     					if (migRate>maxMigRate){
     						migrationRatesValid = false;

@@ -6,8 +6,9 @@ open module starbeast2 {
     requires sampled.ancestors;
     requires morph.models;
     requires com.google.common;
-    requires commons.math;
     requires commons.math3;
+    requires org.apache.commons.statistics.distribution;
+    requires org.apache.commons.numbers.gamma;
     requires java.desktop;
 
     exports starbeast2;

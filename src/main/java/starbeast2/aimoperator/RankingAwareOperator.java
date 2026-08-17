@@ -6,9 +6,10 @@ import beast.base.core.Input.Validate;
 import beast.base.evolution.operator.TreeOperator;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
-import beast.base.inference.parameter.BooleanParameter;
-import beast.base.inference.parameter.RealParameter;
 import beast.base.inference.util.InputUtil;
+import beast.base.spec.domain.NonNegativeReal;
+import beast.base.spec.inference.parameter.BoolVectorParam;
+import beast.base.spec.inference.parameter.RealVectorParam;
 import beast.base.util.Randomizer;
 import starbeast2.NodeHeightComparator;
 
@@ -21,9 +22,9 @@ import java.util.List;
 		+ "restricted by the nodes parent and children.")
 public class RankingAwareOperator extends TreeOperator {
 
-	final public Input<RealParameter> migrationInput = new Input<>("m", "input of ne's of the species",
+	final public Input<RealVectorParam<NonNegativeReal>> migrationInput = new Input<>("m", "input of ne's of the species",
 			Validate.REQUIRED);
-	final public Input<BooleanParameter> indicatorInput = new Input<>("indicator", "input of ne's of the species",
+	final public Input<BoolVectorParam> indicatorInput = new Input<>("indicator", "input of ne's of the species",
 			Validate.OPTIONAL);
 
 	final static NodeHeightComparator nhc = new NodeHeightComparator();
@@ -104,8 +105,8 @@ public class RankingAwareOperator extends TreeOperator {
 
 		int[] mapping = new int[oldMigMap.size()];
 		double[] newmigvals = new double[oldMigMap.size()];
-		double[] newintvals = new double[oldMigMap.size()];
-		
+		boolean[] newintvals = new boolean[oldMigMap.size()];
+
 
 		for (int i = 0; i < oldMigMap.size(); i++)
 			mapping[i] = getIndexOf(newMigMap, oldMigMap.get(i), hasAnalogue);
@@ -137,19 +138,15 @@ public class RankingAwareOperator extends TreeOperator {
 				c++;
 			}
 
-			newmigvals[index] = migrationInput.get().getArrayValue(i);
+			newmigvals[index] = migrationInput.get().get(i);
 			if (indicatorInput.get() != null)
-				newintvals[index] = indicatorInput.get().getArrayValue(i);
+				newintvals[index] = indicatorInput.get().get(i);
 		}
 
 		for (int i = 0; i < newmigvals.length; i++) {
-			migrationInput.get().setValue(i, newmigvals[i]);
+			migrationInput.get().set(i, newmigvals[i]);
 			if (indicatorInput.get() != null)
-				if (newintvals[i] > 0.5)
-					indicatorInput.get().setValue(i, true);
-				else
-					indicatorInput.get().setValue(i, false);
-
+				indicatorInput.get().set(i, newintvals[i]);
 		}
 
 		

@@ -4,7 +4,8 @@ import beast.base.evolution.alignment.Taxon;
 import beast.base.evolution.alignment.TaxonSet;
 import beast.base.evolution.tree.TreeParser;
 import beast.base.inference.State;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.inference.parameter.RealScalarParam;
 import org.junit.Test;
 import starbeast2.GeneTree;
 import starbeast2.MultispeciesCoalescent;
@@ -26,8 +27,8 @@ public class ConstantIOTest {
     private MultispeciesCoalescent msc;
 
     private State state;
-    private RealParameter alphaParameter;
-    private RealParameter meanParameter;
+    private RealScalarParam<PositiveReal> alphaParameter;
+    private RealScalarParam<PositiveReal> meanParameter;
 
     private double ploidy;
     private double expectedLogP;
@@ -45,11 +46,8 @@ public class ConstantIOTest {
         expectedLogP = -14.5233984762; // this should be the right answer (calculated by hand)
 
         state = new State();
-        alphaParameter = new RealParameter();
-        meanParameter = new RealParameter();
-
-        alphaParameter.initByName("value", String.valueOf(alpha));
-        meanParameter.initByName("value", String.valueOf(mean));
+        alphaParameter = new RealScalarParam<>(alpha, PositiveReal.INSTANCE);
+        meanParameter = new RealScalarParam<>(mean, PositiveReal.INSTANCE);
 
         newickSpeciesTree = "((s0:0.32057156677143211,s3:0.32057156677143211):1.2653250035015629,(s1:0.56540722294658641,s2:0.56540722294658641):1.0204893473264085)";
         newickGeneTrees.add("((((s0_tip1:0.3416660303037105,s3_tip0:0.3416660303037105):0.024561190897159135,s0_tip0:0.36622722120086965):0.0643095990846464,s3_tip1:0.43053682028551604):1.4201019862262891,((s1_tip0:0.14473698225381706,s1_tip1:0.14473698225381706):0.5135479407233198,(s2_tip0:0.19897724687831703,s2_tip1:0.19897724687831703):0.4593076760988198):1.1923538835346683)");

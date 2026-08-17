@@ -1,12 +1,13 @@
 package starbeast2;
 
 import beast.base.core.Input;
-import beast.base.evolution.branchratemodel.BranchRateModel;
 import beast.base.evolution.tree.Node;
-import beast.base.inference.parameter.RealParameter;
 import beast.base.inference.util.InputUtil;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.evolution.branchratemodel.Base;
+import beast.base.spec.type.RealScalar;
 
-public class StarBeastClock extends BranchRateModel.Base {
+public class StarBeastClock extends Base {
     public Input<GeneTree> geneTreeInput = new Input<>("geneTree", "The gene tree this relaxed clock is associated with.", Input.Validate.REQUIRED);
     public Input<SpeciesTreeRates> speciesTreeRatesInput = new Input<>("speciesTreeRates", "The per-branch rates for the species tree", Input.Validate.REQUIRED);
 
@@ -15,13 +16,13 @@ public class StarBeastClock extends BranchRateModel.Base {
     private double[] storedBranchRates;
     private boolean needsUpdate;
 
-    RealParameter meanRate;
+    RealScalar<PositiveReal> meanRate;
     SpeciesTreeRates speciesTreeRatesX;
     GeneTree geneTree;
-    
+
     @Override
     public void initAndValidate() {
-        meanRate = (RealParameter) meanRateInput.get();
+        meanRate = meanRateInput.get();
         speciesTreeRatesX = speciesTreeRatesInput.get();
         geneTree = geneTreeInput.get();
     
@@ -52,7 +53,7 @@ public class StarBeastClock extends BranchRateModel.Base {
     }
 
     private void update() {
-        final double geneTreeRate = meanRate.getValue();
+        final double geneTreeRate = meanRate.get();
         final double[] speciesTreeRates = speciesTreeRatesX.getRatesArray();
         final double[] speciesOccupancy = geneTree.getSpeciesOccupancy();
 

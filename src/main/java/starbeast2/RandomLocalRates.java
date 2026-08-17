@@ -2,21 +2,24 @@ package starbeast2;
 
 import beast.base.core.Description;
 import beast.base.core.Input;
-import beast.base.evolution.branchratemodel.BranchRateModel;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.TreeInterface;
-import beast.base.inference.parameter.BooleanParameter;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.NonNegativeReal;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.evolution.branchratemodel.Base;
+import beast.base.spec.inference.parameter.BoolVectorParam;
+import beast.base.spec.inference.parameter.RealVectorParam;
+import beast.base.spec.type.RealScalar;
 
 /**
  * @author Huw Ogilvie
  */
 @Description("Based on RandomLocalClockModel in BEAST v2.4")
-public class RandomLocalRates extends BranchRateModel.Base implements SpeciesTreeRates {
+public class RandomLocalRates extends Base implements SpeciesTreeRates {
     final public Input<TreeInterface> treeInput = new Input<>("tree", "(Species) tree to apply per-branch rates to.", Input.Validate.REQUIRED);
     final public Input<Boolean> noCacheInput = new Input<>("noCache", "Always recalculate branch rates.", false);
-    final public Input<RealParameter> branchRatesInput = new Input<>("rates", "Continuous per-branch rates.", Input.Validate.REQUIRED);
-    final public Input<BooleanParameter> indicatorsInput = new Input<>("indicators", "Indicators associated with nodes in the tree for sampling of individual rate changes among branches.", Input.Validate.REQUIRED);
+    final public Input<RealVectorParam<NonNegativeReal>> branchRatesInput = new Input<>("rates", "Continuous per-branch rates.", Input.Validate.REQUIRED);
+    final public Input<BoolVectorParam> indicatorsInput = new Input<>("indicators", "Indicators associated with nodes in the tree for sampling of individual rate changes among branches.", Input.Validate.REQUIRED);
 
     private boolean noCache;
     private boolean needsUpdate;
@@ -48,7 +51,7 @@ public class RandomLocalRates extends BranchRateModel.Base implements SpeciesTre
 
     @Override
     public void initAndValidate() {
-        BooleanParameter indicators = indicatorsInput.get();
+        BoolVectorParam indicators = indicatorsInput.get();
         TreeInterface tree = treeInput.get();
         int nodeCount = tree.getNodeCount();
 
@@ -58,17 +61,12 @@ public class RandomLocalRates extends BranchRateModel.Base implements SpeciesTre
 
         noCache = noCacheInput.get().booleanValue();
 
-        RealParameter rates = branchRatesInput.get();
+        RealVectorParam<NonNegativeReal> rates = branchRatesInput.get();
         rates.setDimension(rootNodeNumber);
         indicators.setDimension(rootNodeNumber);
 
-        if (rates.lowerValueInput.get() == null || rates.lowerValueInput.get() < 0.0) {
-            rates.setLower(0.0);
-        }
-        if (rates.upperValueInput.get() == null || rates.upperValueInput.get() < 0.0) {
-            rates.setUpper(Double.MAX_VALUE);
-        }
-        
+        // lower/upper bounds are now enforced structurally by the NonNegativeReal domain
+
         needsUpdate = true;
     }
 
@@ -80,7 +78,7 @@ public class RandomLocalRates extends BranchRateModel.Base implements SpeciesTre
      * @param node the node
      * @param rate the rate of the parent node
      */
-    private void recurseBranchRates(Node node, double parentHeight, double rate, Boolean[] indicators, Double[] branchRates) {
+    private void recurseBranchRates(Node node, double parentHeight, double rate, boolean[] indicators, double[] branchRates) {
         final int nodeNumber = node.getNr();
         final double nodeHeight = node.getHeight();
 
@@ -102,17 +100,17 @@ public class RandomLocalRates extends BranchRateModel.Base implements SpeciesTre
     }
 
     private void update() {
-        final Boolean[] indicators = indicatorsInput.get().getValues();
-        final Double[] rates = branchRatesInput.get().getValues();
+        final boolean[] indicators = indicatorsInput.get().getValues();
+        final double[] rates = branchRatesInput.get().getValues();
         final Node treeRoot = treeInput.get().getRoot();
         final double treeHeight = treeRoot.getHeight();
 
         double estimatedMean;
-        final RealParameter estimatedMeanParameter = (RealParameter) meanRateInput.get();
+        final RealScalar<PositiveReal> estimatedMeanParameter = meanRateInput.get();
         if (estimatedMeanParameter == null) {
             estimatedMean = 1.0;
         } else {
-            estimatedMean = estimatedMeanParameter.getValue();
+            estimatedMean = estimatedMeanParameter.get();
         }
 
         ratesArray[rootNodeNumber] = estimatedMean;

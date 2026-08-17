@@ -5,7 +5,8 @@ import beast.base.core.Input;
 import beast.base.core.Input.Validate;
 import beast.base.evolution.tree.Node;
 import beast.base.inference.CalculationNode;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.inference.parameter.RealScalarParam;
 
 import java.text.DecimalFormat;
 
@@ -15,7 +16,7 @@ import java.text.DecimalFormat;
 
 public class UniformPopulations extends CalculationNode implements PopulationModel {
     public Input<SpeciesTreeInterface> speciesTreeInput = new Input<>("speciesTree", "The species tree this model applies to.", Validate.REQUIRED);
-    public Input<RealParameter> universalSizeInput = new Input<RealParameter>("universalSize", "Universal constant population size.", Validate.REQUIRED);
+    public Input<RealScalarParam<PositiveReal>> universalSizeInput = new Input<>("universalSize", "Universal constant population size.", Validate.REQUIRED);
 
     private SpeciesTreeInterface speciesTree;
 
@@ -36,7 +37,7 @@ public class UniformPopulations extends CalculationNode implements PopulationMod
 
     @Override
     public double branchLogP(int speciesTreeNodeNumber, Node speciesTreeNode, double ploidy, double[] branchCoalescentTimes, int branchLineageCount, int branchEventCount) {
-        final double popSize = universalSizeInput.get().getValue();
+        final double popSize = universalSizeInput.get().get();
         double logP = uniformLogP(popSize, ploidy, branchCoalescentTimes, branchLineageCount, branchEventCount);
 
         return logP;
@@ -44,18 +45,18 @@ public class UniformPopulations extends CalculationNode implements PopulationMod
 
     @Override
     public void initPopSizes(double popInitial) {
-        final RealParameter universalSize = universalSizeInput.get();
+        final RealScalarParam<PositiveReal> universalSize = universalSizeInput.get();
         final double lower = universalSize.getLower();
         final double upper = universalSize.getUpper();
 
         if (universalSize.isEstimatedInput.get() && popInitial > lower && popInitial < upper) {
-            universalSize.setValue(popInitial);
+            universalSize.set(popInitial);
         }
     }
 
     @Override
     public void serialize(Node speciesTreeNode, StringBuffer buf, DecimalFormat df) {
-        final double popSize = universalSizeInput.get().getValue();
+        final double popSize = universalSizeInput.get().get();
 
         buf.append("dmv={");
         if (df == null) {
@@ -68,9 +69,9 @@ public class UniformPopulations extends CalculationNode implements PopulationMod
 
     @Override
     public boolean isDirtyBranch(Node speciesNode) {
-        final RealParameter universalSize = universalSizeInput.get();
+        final RealScalarParam<PositiveReal> universalSize = universalSizeInput.get();
 
-        return universalSize.isDirty(0);
+        return universalSize.somethingIsDirty();
     }
 
     protected static double uniformLogP(double popSize, double ploidy, double[] geneTimes, int geneN, int geneK) {

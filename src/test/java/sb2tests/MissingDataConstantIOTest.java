@@ -4,7 +4,8 @@ import beast.base.evolution.alignment.Taxon;
 import beast.base.evolution.alignment.TaxonSet;
 import beast.base.evolution.tree.TreeParser;
 import beast.base.inference.State;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.inference.parameter.RealScalarParam;
 import org.junit.Test;
 import starbeast2.GeneTree;
 import starbeast2.MultispeciesCoalescent;
@@ -26,8 +27,8 @@ public class MissingDataConstantIOTest {
     private MultispeciesCoalescent msc;
 
     private State state;
-    private RealParameter alphaParameter;
-    private RealParameter meanParameter;
+    private RealScalarParam<PositiveReal> alphaParameter;
+    private RealScalarParam<PositiveReal> meanParameter;
 
     private double ploidy;
     private double expectedLogP;
@@ -45,12 +46,9 @@ public class MissingDataConstantIOTest {
         expectedLogP = -10.956285249389675; // haven't checked this is the right answer
 
         state = new State();
-        alphaParameter = new RealParameter();
-        meanParameter = new RealParameter();
+        alphaParameter = new RealScalarParam<>(alpha, PositiveReal.INSTANCE);
+        meanParameter = new RealScalarParam<>(mean, PositiveReal.INSTANCE);
 
-        alphaParameter.initByName("value", String.valueOf(alpha));
-        meanParameter.initByName("value", String.valueOf(mean));
-        
         newickSpeciesTree = "((s0:0.32057156677143211,s3:0.32057156677143211):1.2653250035015629,(s1:0.56540722294658641,s2:0.56540722294658641):1.0204893473264085)";
         newickGeneTrees.add("((((s0_tip1:0.3416660303037105,s3_tip0:0.3416660303037105):0.024561190897159135,s0_tip0:0.36622722120086965):0.0643095990846464,s3_tip1:0.43053682028551604):1.4201019862262891,(s2_tip0:0.19897724687831703,s2_tip1:0.19897724687831703):1.651661559633488)");
         newickGeneTrees.add("((s3_tip0:0.09482581277282173,s3_tip1:0.09482581277282173):1.6017973588278296,((s1_tip0:0.33170960882423645,s1_tip1:0.33170960882423645):0.29497523293318856,(s2_tip0:0.2908611340994834,s2_tip1:0.2908611340994834):0.3358237076579416):1.0699383298432266)");

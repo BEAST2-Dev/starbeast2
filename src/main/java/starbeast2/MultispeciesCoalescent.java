@@ -5,7 +5,8 @@ import beast.base.core.Input;
 import beast.base.inference.CompoundDistribution;
 import beast.base.inference.Distribution;
 import beast.base.inference.State;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.type.RealScalar;
 
 import java.util.List;
 import java.util.Random;
@@ -18,11 +19,11 @@ import java.util.Random;
 
 @Description("Calculates probability of gene trees conditioned on a species tree (the multi-species coalescent).")
 public class MultispeciesCoalescent extends CompoundDistribution {
-    final public Input<RealParameter> populationShapeInput = new Input<>("populationShape", "Shape of the inverse gamma prior distribution on population sizes.");
-    final public Input<RealParameter> populationMeanInput = new Input<>("populationMean", "Mean of the inverse gamma prior distribution on population sizes.");
+    final public Input<RealScalar<PositiveReal>> populationShapeInput = new Input<>("populationShape", "Shape of the inverse gamma prior distribution on population sizes.");
+    final public Input<RealScalar<PositiveReal>> populationMeanInput = new Input<>("populationMean", "Mean of the inverse gamma prior distribution on population sizes.");
 
-    private RealParameter invGammaShape;
-    private RealParameter invGammaMean;
+    private RealScalar<PositiveReal> invGammaShape;
+    private RealScalar<PositiveReal> invGammaMean;
 
     private int nGeneTrees;
     private int speciesNodeCount;
@@ -134,8 +135,8 @@ public class MultispeciesCoalescent extends CompoundDistribution {
     private boolean checkHyperparameters(final boolean force) {
         invGammaShape = populationShapeInput.get();
         invGammaMean = populationMeanInput.get();
-        final double currentAlpha = invGammaShape.getValue();
-        final double currentBeta = invGammaMean.getValue() * (alpha - 1.0);
+        final double currentAlpha = invGammaShape.get();
+        final double currentBeta = invGammaMean.get() * (alpha - 1.0);
 
         if (force || currentAlpha != alpha || currentBeta != beta) {
             alpha = currentAlpha;

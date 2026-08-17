@@ -2,14 +2,15 @@ package starbeast2;
 
 import beast.base.core.Input;
 import beast.base.evolution.tree.Node;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.type.RealScalar;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Overlap extends MigrationModel {
-	
-    public Input<RealParameter> effectiveMigrantsInput  = new Input<>("effectiveMigrants","absolute migration rates",Input.Validate.OPTIONAL);
+
+    public Input<RealScalar<PositiveReal>> effectiveMigrantsInput  = new Input<>("effectiveMigrants","absolute migration rates",Input.Validate.OPTIONAL);
     public Input<Double> minimalBranchLengthInput  = new Input<>("minimalBranchLength","absolute migration rates", 0.0);
 
     public Input<String> excludeInput = new Input<>("exclude", "nodes with no migration");
@@ -78,12 +79,12 @@ public class Overlap extends MigrationModel {
 		if (effectiveMigrantsInput.get()==null)
 			return 1.0/b;
 		else
-			return effectiveMigrantsInput.get().getValue()/(b); 		
+			return effectiveMigrantsInput.get().get()/(b); 		
 	}
 
 	@Override
 	public double getEM() {
-		return effectiveMigrantsInput.get().getValue();
+		return effectiveMigrantsInput.get().get();
 	}	
 
 		

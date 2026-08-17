@@ -6,7 +6,8 @@ import beast.base.core.Input.Validate;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
 import beast.base.inference.CalculationNode;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.inference.parameter.RealVectorParam;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -18,8 +19,8 @@ import java.util.Arrays;
 
 public class LinearWithConstantRoot extends CalculationNode implements PopulationModel {
     public Input<SpeciesTreeInterface> speciesTreeInput = new Input<>("speciesTree", "The species tree this model applies to.", Validate.REQUIRED);
-    public Input<RealParameter> tipPopSizesInput = new Input<>("tipPopulationSizes", "Population sizes at the tips of leaf branches.", Validate.REQUIRED);
-    public Input<RealParameter> topPopSizesInput = new Input<>("topPopulationSizes", "Population sizes at the top of non-root branches.", Validate.REQUIRED);
+    public Input<RealVectorParam<PositiveReal>> tipPopSizesInput = new Input<>("tipPopulationSizes", "Population sizes at the tips of leaf branches.", Validate.REQUIRED);
+    public Input<RealVectorParam<PositiveReal>> topPopSizesInput = new Input<>("topPopulationSizes", "Population sizes at the top of non-root branches.", Validate.REQUIRED);
 
     private SpeciesTreeInterface speciesTree;
 
@@ -48,23 +49,23 @@ public class LinearWithConstantRoot extends CalculationNode implements Populatio
 
     @Override
     public double branchLogP(int speciesTreeNodeNumber, Node speciesTreeNode, double ploidy, double[] branchCoalescentTimes, int branchLineageCount, int branchEventCount) {
-        final RealParameter tipPopSizes = tipPopSizesInput.get();
-        final RealParameter topPopSizes = topPopSizesInput.get();
+        final RealVectorParam<PositiveReal> tipPopSizes = tipPopSizesInput.get();
+        final RealVectorParam<PositiveReal> topPopSizes = topPopSizesInput.get();
 
         double branchTipPopSize;
         if (speciesTreeNode.isLeaf()) {
-            branchTipPopSize = tipPopSizes.getValue(speciesTreeNodeNumber);
+            branchTipPopSize = tipPopSizes.get(speciesTreeNodeNumber);
         } else {
             final int leftChildTopI = speciesTreeNode.getLeft().getNr();
             final int rightChildTopI = speciesTreeNode.getRight().getNr();
-            branchTipPopSize = topPopSizes.getValue(leftChildTopI) + topPopSizes.getValue(rightChildTopI);
+            branchTipPopSize = topPopSizes.get(leftChildTopI) + topPopSizes.get(rightChildTopI);
         }
 
         if (speciesTreeNode.isRoot()) {
             return ConstantPopulations.constantLogP(branchTipPopSize, ploidy, branchCoalescentTimes, branchLineageCount, branchEventCount);
         } else {
             final int speciesTopI = speciesTreeNodeNumber;
-            final double branchTopPopSize = topPopSizes.getValue(speciesTopI);
+            final double branchTopPopSize = topPopSizes.get(speciesTopI);
             return linearLogP(branchTopPopSize, branchTipPopSize, ploidy, branchCoalescentTimes, branchLineageCount, branchEventCount);
         }
     }
@@ -73,8 +74,8 @@ public class LinearWithConstantRoot extends CalculationNode implements Populatio
     public void initPopSizes(double tipInitial) {
         final double topInitial = tipInitial * 0.5;
 
-        final RealParameter tipPopSizes = tipPopSizesInput.get();
-        final RealParameter topPopSizes = topPopSizesInput.get();
+        final RealVectorParam<PositiveReal> tipPopSizes = tipPopSizesInput.get();
+        final RealVectorParam<PositiveReal> topPopSizes = topPopSizesInput.get();
 
         final double tipLower = tipPopSizes.getLower();
         final double tipUpper = tipPopSizes.getUpper();
@@ -83,32 +84,32 @@ public class LinearWithConstantRoot extends CalculationNode implements Populatio
         final double topUpper = topPopSizes.getUpper();
 
         if (tipPopSizes.isEstimatedInput.get() && tipInitial > tipLower && tipInitial < tipUpper) {
-            for (int i = 0; i < tipPopSizes.getDimension(); i++)
-                tipPopSizes.setValue(i, tipInitial);
+            for (int i = 0; i < tipPopSizes.size(); i++)
+                tipPopSizes.set(i, tipInitial);
         }
 
         if (topPopSizes.isEstimatedInput.get() && topInitial > topLower && topInitial < topUpper) {
-	        for (int i = 0; i < topPopSizes.getDimension(); i++)
-	            topPopSizes.setValue(i, topInitial);
+	        for (int i = 0; i < topPopSizes.size(); i++)
+	            topPopSizes.set(i, topInitial);
         }
     }
 
     @Override
     public void serialize(Node speciesTreeNode, StringBuffer buf, DecimalFormat df) {
-        final RealParameter tipPopSizes = tipPopSizesInput.get();
-        final RealParameter topPopSizes = topPopSizesInput.get();
+        final RealVectorParam<PositiveReal> tipPopSizes = tipPopSizesInput.get();
+        final RealVectorParam<PositiveReal> topPopSizes = topPopSizesInput.get();
         final int speciesTreeNodeNumber = speciesTreeNode.getNr();
 
         double branchTipPopSize;
         if (speciesTreeNode.isLeaf()) {
-            branchTipPopSize = tipPopSizes.getValue(speciesTreeNodeNumber);
+            branchTipPopSize = tipPopSizes.get(speciesTreeNodeNumber);
         } else {
             final int leftChildTopI = speciesTreeNode.getLeft().getNr();
             final int rightChildTopI = speciesTreeNode.getRight().getNr();
-            branchTipPopSize = topPopSizes.getValue(leftChildTopI) + topPopSizes.getValue(rightChildTopI);
+            branchTipPopSize = topPopSizes.get(leftChildTopI) + topPopSizes.get(rightChildTopI);
         }
 
-        final double branchTopPopSize = (speciesTreeNode.isRoot()) ? branchTipPopSize : topPopSizes.getValue(speciesTreeNode.getNr());
+        final double branchTopPopSize = (speciesTreeNode.isRoot()) ? branchTipPopSize : topPopSizes.get(speciesTreeNode.getNr());
 
         if (df == null) buf.append("dmv={" + branchTopPopSize + "," + branchTipPopSize + "}");
         else buf.append("dmv={" + df.format(branchTopPopSize) + "," + df.format(branchTipPopSize) + "}");
@@ -117,8 +118,8 @@ public class LinearWithConstantRoot extends CalculationNode implements Populatio
     @Override
     public boolean isDirtyBranch(Node speciesNode) {
         if (needsUpdate) {
-            final RealParameter tipPopSizes = tipPopSizesInput.get();
-            final RealParameter topPopSizes = topPopSizesInput.get();
+            final RealVectorParam<PositiveReal> tipPopSizes = tipPopSizesInput.get();
+            final RealVectorParam<PositiveReal> topPopSizes = topPopSizesInput.get();
 
             Arrays.fill(speciesBranchStatus, false);
             Node[] speciesNodes = speciesTree.getNodesAsArray();

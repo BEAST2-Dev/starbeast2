@@ -5,7 +5,7 @@ import beast.base.core.Input.Validate;
 import beast.base.evolution.branchratemodel.BranchRateModel;
 import beast.base.evolution.tree.Node;
 import beast.base.inference.StateNode;
-import beast.base.inference.parameter.Parameter;
+import beast.base.spec.type.Tensor;
 
 import java.io.PrintStream;
 import java.math.RoundingMode;
@@ -114,20 +114,21 @@ public class SpeciesTreeLogger extends BEASTObject implements Loggable {
                 for (Function metadata : metadataList) {
                     buf.append(((BEASTObject)metadata).getID());
                     buf.append('=');
-                    if (metadata instanceof Parameter<?>) {
-                        Parameter<?> p = (Parameter<?>) metadata;
-                        int dim = p.getMinorDimension1();
-                        if (dim > 1) {
+                    if (metadata instanceof Tensor<?,?> t) {
+                        if (t.rank() == 2) {
+                            // matrix-shaped: one row per node, iterate the minor (second) dimension
+                            final int dim = t.shape()[1];
                             buf.append('{');
                             for (int i = 0; i < dim; i++) {
-                                buf.append(p.getMatrixValue(node.getNr(), i));
+                                buf.append(t.get(node.getNr(), i));
                                 if (i < dim - 1) {
                                     buf.append(',');
                                 }
                             }
                             buf.append('}');
                         } else {
-                            buf.append(metadata.getArrayValue(node.getNr()));
+                            // scalar or vector-shaped: one value per node
+                            buf.append(t.get(node.getNr()));
                         }
                     } else {
                         buf.append(metadata.getArrayValue(node.getNr()));

@@ -4,7 +4,8 @@ import beast.base.evolution.alignment.Taxon;
 import beast.base.evolution.alignment.TaxonSet;
 import beast.base.evolution.tree.TreeParser;
 import beast.base.inference.State;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.inference.parameter.RealVectorParam;
 import org.junit.Test;
 import starbeast2.ConstantPopulations;
 import starbeast2.GeneTree;
@@ -24,7 +25,7 @@ public class IncompatibleTreeTest {
     private ConstantPopulations popModel;
 
     private State state;
-    private RealParameter popsizeParameter;
+    private RealVectorParam<PositiveReal> popsizeParameter;
 
     private double ploidy;
     private double popSize;
@@ -41,7 +42,6 @@ public class IncompatibleTreeTest {
         expectedLogP = Double.NEGATIVE_INFINITY;
 
         state = new State();
-        popsizeParameter = new RealParameter();
 
         newickSpeciesTree = "((T4:5.982015323363934,((T1:1.9435075796666423,T2:1.9435075796666423):2.031076829347149,T3:3.9745844090137914):2.007430914350143):1.9848867018863912,(((T5:0.021716110420807247,T7:0.021716110420807247):0.005999952952004395,T6:0.027716063372811642):0.0043842395682471905,T8:0.03210030294105883):7.934801722309267)";
         newickGeneTrees.add("((((((T1_1:0.579713480872118,(T2_1:0.05611562075920323,T2_2:0.05611562075920323):0.5235978601129148):0.08787237243508017,T1_2:0.6675858533071982):0.09003817632305622,T3_2:0.7576240296302544):0.7947472706863555,T3_1:1.55237130031661):0.9175463345004531,((T4_1:0.07822345639893319,T4_2:0.07822345639893319):1.9276398321493908,T8_1:2.005863288548324):0.464054346268739):0.7187520201759066,((((T5_1:0.04820585227227065,T5_2:0.04820585227227065):0.44158170738649616,T8_2:0.4897875596587668):0.03103744358250654,((T6_1:0.03361079557684876,T7_1:0.03361079557684876):0.006140006250793695,T7_2:0.03975080182764246):0.4810742014136309):1.0088148036996385,T6_2:1.5296398069409118):1.6590298480520578)");
@@ -55,7 +55,7 @@ public class IncompatibleTreeTest {
         speciesTree.initByName("newick", newickSpeciesTree, "IsLabelledNewick", true, "taxonset", speciesSuperset);
 
         final int nBranches = nSpecies * 2 - 1;
-        popsizeParameter.initByName("value", String.valueOf(popSize), "dimension", String.valueOf(nBranches));
+        popsizeParameter = new RealVectorParam<>(nBranches, new double[]{popSize}, PositiveReal.INSTANCE);
         state.initByName("stateNode", popsizeParameter);
 
         popModel = new ConstantPopulations();

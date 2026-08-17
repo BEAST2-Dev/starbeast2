@@ -2,7 +2,8 @@ package starbeast2;
 
 import beast.base.core.Input;
 import beast.base.core.Input.Validate;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.Real;
+import beast.base.spec.inference.parameter.RealVectorParam;
 import beast.base.util.Randomizer;
 
 /**
@@ -15,7 +16,7 @@ import beast.base.util.Randomizer;
  */
 
 public class NetworkRateExchange extends AdaptiveOperator {
-    final public Input<RealParameter> treeRatesInput = new Input<>("treeRates", "The branch rates.", Validate.REQUIRED);
+    final public Input<RealVectorParam<Real>> treeRatesInput = new Input<>("treeRates", "The branch rates.", Validate.REQUIRED);
     final public Input<Double> deltaInput = new Input<>("delta", "Magnitude of change for two randomly picked values.", 1.0);
 
     private int nNodes;
@@ -25,8 +26,8 @@ public class NetworkRateExchange extends AdaptiveOperator {
 
     @Override
     public void initAndValidate() {
-        final RealParameter treeRates = treeRatesInput.get();
-        nNodes = treeRates.getDimension();
+        final RealVectorParam<Real> treeRates = treeRatesInput.get();
+        nNodes = treeRates.size();
         lowerBound = treeRates.getLower();
         upperBound = treeRates.getUpper();
 
@@ -39,8 +40,8 @@ public class NetworkRateExchange extends AdaptiveOperator {
     // symmetric proposal distribution
     @Override
     public double proposal() {
-        final RealParameter treeRates = treeRatesInput.get();
-        final double[] treeRatesArray = treeRates.getDoubleValues();
+        final RealVectorParam<Real> treeRates = treeRatesInput.get();
+        final double[] treeRatesArray = treeRates.getValues();
         final int[] network = chooseK(nNodes);
 
         // exchange a new delta between all pairs of nodes in 'network'
@@ -58,7 +59,7 @@ public class NetworkRateExchange extends AdaptiveOperator {
             if (newRate < lowerBound || newRate > upperBound) {
                 return Double.NEGATIVE_INFINITY;
             } else {
-                treeRates.setValue(nodeNumber, newRate);
+                treeRates.set(nodeNumber, newRate);
             }
         }
 

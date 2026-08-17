@@ -1,25 +1,24 @@
 package starbeast2;
 
 import beast.base.core.Input;
-import beast.base.evolution.branchratemodel.BranchRateModel;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.TreeInterface;
-import beast.base.inference.parameter.IntegerParameter;
-import beast.base.inference.parameter.RealParameter;
 import beast.base.inference.util.InputUtil;
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.ExponentialDistribution;
-import org.apache.commons.math.distribution.ExponentialDistributionImpl;
-import org.apache.commons.math.distribution.NormalDistribution;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
+import beast.base.spec.domain.NonNegativeInt;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.evolution.branchratemodel.Base;
+import beast.base.spec.inference.parameter.IntVectorParam;
+import beast.base.spec.type.RealScalar;
+import org.apache.commons.statistics.distribution.ExponentialDistribution;
+import org.apache.commons.statistics.distribution.NormalDistribution;
 
-public class UncorrelatedRates extends BranchRateModel.Base implements SpeciesTreeRates {
+public class UncorrelatedRates extends Base implements SpeciesTreeRates {
     final public Input<TreeInterface> treeInput = new Input<>("tree", "(Species) tree to apply per-branch rates to.", Input.Validate.REQUIRED);
     final public Input<Integer> nBinsInput = new Input<>("nBins", "Number of discrete branch rate bins (default is equal to the number of estimated branch rates).", -1);
     final public Input<Boolean> estimateRootInput = new Input<>("estimateRoot", "Estimate rate of the root branch.", false);
     final public Input<Boolean> noCacheInput = new Input<>("noCache", "Always recalculate branch rates.", false);
-    final public Input<RealParameter> stdevInput = new Input<>("stdev", "Standard deviation of the log-normal distribution for branch rates. If not supplied uses exponential.");
-    final public Input<IntegerParameter> branchRatesInput = new Input<>("rates", "Discrete per-branch rates.", Input.Validate.REQUIRED);
+    final public Input<RealScalar<PositiveReal>> stdevInput = new Input<>("stdev", "Standard deviation of the log-normal distribution for branch rates. If not supplied uses exponential.");
+    final public Input<IntVectorParam<NonNegativeInt>> branchRatesInput = new Input<>("rates", "Discrete per-branch rates.", Input.Validate.REQUIRED);
 
     private int nBins;
     private double currentLogNormalStdev;
@@ -40,7 +39,7 @@ public class UncorrelatedRates extends BranchRateModel.Base implements SpeciesTr
     @Override
     public boolean requiresRecalculation() {
         if (useLogNormal) {
-            final double proposedLogNormalStdev = stdevInput.get().getValue();
+            final double proposedLogNormalStdev = stdevInput.get().get();
             if (proposedLogNormalStdev != currentLogNormalStdev) {
                 binRatesNeedsUpdate = true;
             } else {
@@ -79,7 +78,7 @@ public class UncorrelatedRates extends BranchRateModel.Base implements SpeciesTr
 
     @Override
     public void initAndValidate() {
-        final IntegerParameter branchRates = branchRatesInput.get();
+        final IntVectorParam<NonNegativeInt> branchRates = branchRatesInput.get();
         final TreeInterface speciesTree = treeInput.get();
         final Node[] speciesNodes = speciesTree.getNodesAsArray();
         estimateRoot = estimateRootInput.get().booleanValue();
@@ -110,13 +109,9 @@ public class UncorrelatedRates extends BranchRateModel.Base implements SpeciesTr
         if (stdevInput.get() == null) {
             useLogNormal = false;
 
-            final ExponentialDistribution exponentialDistr = new ExponentialDistributionImpl(1.0);
-            try {
-                for (int i = 0; i < nBins; i++) {
-                    binRates[i] = exponentialDistr.inverseCumulativeProbability((i + 0.5) / nBins);
-                }
-            } catch (MathException e) {
-                throw new RuntimeException("Failed to compute inverse cumulative probability!");
+            final ExponentialDistribution exponentialDistr = ExponentialDistribution.of(1.0);
+            for (int i = 0; i < nBins; i++) {
+                binRates[i] = exponentialDistr.inverseCumulativeProbability((i + 0.5) / nBins);
             }
 
             binRatesNeedsUpdate = false;
@@ -131,28 +126,24 @@ public class UncorrelatedRates extends BranchRateModel.Base implements SpeciesTr
     private void update() {
         if (useLogNormal && (binRatesNeedsUpdate || noCache)) {
             // set the mean in real space to equal 1
-            currentLogNormalStdev = stdevInput.get().getValue();
+            currentLogNormalStdev = stdevInput.get().get();
             final double newMean = -(0.5 * currentLogNormalStdev * currentLogNormalStdev);
-            final NormalDistribution normalDistr = new NormalDistributionImpl(newMean, currentLogNormalStdev);
+            final NormalDistribution normalDistr = NormalDistribution.of(newMean, currentLogNormalStdev);
 
-            try {
-                for (int i = 0; i < nBins; i++) {
-                    binRates[i] = Math.exp(normalDistr.inverseCumulativeProbability((i + 0.5) / nBins));
-                }
-            } catch (MathException e) {
-                throw new RuntimeException("Failed to compute inverse cumulative probability!");
+            for (int i = 0; i < nBins; i++) {
+                binRates[i] = Math.exp(normalDistr.inverseCumulativeProbability((i + 0.5) / nBins));
             }
         }
 
         Double estimatedMean;
-        final RealParameter estimatedMeanParameter = (RealParameter) meanRateInput.get();
+        final RealScalar<PositiveReal> estimatedMeanParameter = meanRateInput.get();
         if (estimatedMeanParameter == null) {
             estimatedMean = 1.0;
         } else {
-            estimatedMean = estimatedMeanParameter.getValue();
+            estimatedMean = estimatedMeanParameter.get();
         }
 
-        final Integer[] branchRatePointers = branchRatesInput.get().getValues();
+        final int[] branchRatePointers = branchRatesInput.get().getValues();
         for (int i = 0; i < nEstimatedRates; i++) {
             int b = branchRatePointers[i];
             ratesArray[i] = binRates[b] * estimatedMean;

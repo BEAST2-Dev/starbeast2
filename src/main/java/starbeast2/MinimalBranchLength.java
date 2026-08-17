@@ -2,14 +2,15 @@ package starbeast2;
 
 import beast.base.core.Input;
 import beast.base.evolution.tree.Node;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.type.RealScalar;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class MinimalBranchLength extends MigrationModel {
-	
-    public Input<RealParameter> effectiveMigrantsInput  = new Input<>("effectiveMigrants","absolute migration rates",Input.Validate.REQUIRED);
+
+    public Input<RealScalar<PositiveReal>> effectiveMigrantsInput  = new Input<>("effectiveMigrants","absolute migration rates",Input.Validate.REQUIRED);
     public Input<Double> minimalBranchLengthInput  = new Input<>("minimalBranchLength","minimum bound to stop arbitrarily large prior on migration rate", 0.0001);
 
     
@@ -48,12 +49,12 @@ public class MinimalBranchLength extends MigrationModel {
 		}
 		double b = Math.max(Math.min((heights.get(0)-n1.getHeight()), (heights.get(0)-n2.getHeight())), minimalBranchLengthInput.get());
 		
-		return effectiveMigrantsInput.get().getValue()/(b) ; 		
+		return effectiveMigrantsInput.get().get()/(b) ; 		
 	}
 
 	@Override
 	public double getEM() {
-		return effectiveMigrantsInput.get().getValue();
+		return effectiveMigrantsInput.get().get();
 	}	
 
 		

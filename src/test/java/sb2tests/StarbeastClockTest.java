@@ -5,8 +5,10 @@ import beast.base.evolution.alignment.TaxonSet;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.TreeParser;
 import beast.base.inference.State;
-import beast.base.inference.parameter.IntegerParameter;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.NonNegativeInt;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.inference.parameter.IntVectorParam;
+import beast.base.spec.inference.parameter.RealScalarParam;
 import org.junit.Test;
 import starbeast2.GeneTree;
 import starbeast2.SpeciesTreeParser;
@@ -38,9 +40,9 @@ public class StarbeastClockTest {
 
     final double allowedError = 10e-6;
 
-    private RealParameter meanRateParameter;
-    private RealParameter stdevParameter;
-    private IntegerParameter branchRatesParameter;
+    private RealScalarParam<PositiveReal> meanRateParameter;
+    private RealScalarParam<PositiveReal> stdevParameter;
+    private IntVectorParam<NonNegativeInt> branchRatesParameter;
 
     private StarBeastClock geneTreeClock;
     private UncorrelatedRates speciesTreeClock;
@@ -55,13 +57,9 @@ public class StarbeastClockTest {
         TaxonSet speciesSuperSet = generateSuperset();
         initializeTrees(speciesSuperSet);
 
-        meanRateParameter = new RealParameter();
-        stdevParameter = new RealParameter();
-        branchRatesParameter = new IntegerParameter();
-
-        meanRateParameter.initByName("value", String.valueOf(meanRate));
-        stdevParameter.initByName("value", String.valueOf(1.0));
-        branchRatesParameter.initByName("value", String.valueOf(initialBranchRate));
+        meanRateParameter = new RealScalarParam<>(meanRate, PositiveReal.INSTANCE);
+        stdevParameter = new RealScalarParam<>(1.0, PositiveReal.INSTANCE);
+        branchRatesParameter = new IntVectorParam<>(new int[]{initialBranchRate}, NonNegativeInt.INSTANCE);
 
         // Create dummy state to allow statenode editing
         State state = new State();
@@ -160,7 +158,7 @@ public class StarbeastClockTest {
         if (targetNode == null) {
             return false;
         } else {
-            branchRatesParameter.setValue(targetNode.getNr(), rate);
+            branchRatesParameter.set(targetNode.getNr(), rate);
             return true;
         }
     }

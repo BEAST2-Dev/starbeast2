@@ -55,9 +55,9 @@ import beast.base.core.Input;
 import beast.base.core.Input.Validate;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
-import beast.base.inference.parameter.Parameter;
-import beast.base.inference.parameter.RealParameter;
 import beast.base.inference.util.InputUtil;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.inference.parameter.RealVectorParam;
 import beast.base.util.Randomizer;
 
 import java.text.DecimalFormat;
@@ -75,7 +75,7 @@ import java.util.List;
         "slide down into.")
 public class SubtreeSlideAndSwap extends RankingAwareOperator {
 	
-	final public Input<RealParameter> NeInput = new Input<>("Ne", "input of ne's of the species", Validate.REQUIRED);
+	final public Input<RealVectorParam<PositiveReal>> NeInput = new Input<>("Ne", "input of ne's of the species", Validate.REQUIRED);
     final public Input<Double> sizeInput = new Input<>("size", "size of the slide, default 1.0", 1.0);
     final public Input<Boolean> gaussianInput = new Input<>("gaussian", "Gaussian (=true=default) or uniform delta", true);
     final public Input<Boolean> optimiseInput = new Input<>("optimise", "flag to indicate that the scale factor is automatically changed in order to achieve a good acceptance rate (default true)", true);
@@ -85,7 +85,7 @@ public class SubtreeSlideAndSwap extends RankingAwareOperator {
     double size;
     private double limit;
     
-    Parameter<?> Ne;
+    RealVectorParam<PositiveReal> Ne;
 
     @Override
     public void initAndValidate() {
