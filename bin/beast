@@ -1,0 +1,21 @@
+#!/bin/sh
+# Run BEAST3 against a starbeast2 XML.
+#
+# Delegates to the exec-maven-plugin already configured in pom.xml, so Maven
+# resolves the full module path (beast-base, beast-fx, SA, MM, guava,
+# commons-math3, ...) straight from pom.xml's own dependency graph. No
+# manual jar paths, no separate ../beast3 build.
+#
+# Usage:
+#   bin/beast -validate path/to/file.xml
+#   bin/beast -overwrite path/to/file.xml
+
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+if [ "$#" -eq 0 ]; then
+    echo "Usage: $0 [-validate|-overwrite] path/to/file.xml" >&2
+    exit 1
+fi
+
+cd "$PROJECT_ROOT"
+exec mvn -q compile exec:exec -Dbeast.args="$*"
