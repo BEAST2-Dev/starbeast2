@@ -11,7 +11,7 @@
     <name>StarBEAST2</name>
     <description>Multispecies coalescent inference of species trees and other phylogenetic parameters</description>
 
-    <url>https://github.com/genomescale/starbeast2</url>
+    <url>https://github.com/BEAST2-Dev/starbeast2</url>
 
     <licenses>
         <license>
@@ -20,10 +20,23 @@
         </license>
     </licenses>
 
+    <developers>
+        <developer>
+            <name>Huw Ogilvie</name>
+        </developer>
+        <developer>
+            <name>Remco Bouckaert</name>
+        </developer>
+        <developer>
+            <name>Alexei Drummond</name>
+            <url>https://github.com/alexeid</url>
+        </developer>
+    </developers>
+
     <scm>
-        <connection>scm:git:git://github.com/genomescale/starbeast2.git</connection>
-        <developerConnection>scm:git:ssh://github.com:genomescale/starbeast2.git</developerConnection>
-        <url>https://github.com/genomescale/starbeast2</url>
+        <connection>scm:git:git://github.com/BEAST2-Dev/starbeast2.git</connection>
+        <developerConnection>scm:git:ssh://github.com:BEAST2-Dev/starbeast2.git</developerConnection>
+        <url>https://github.com/BEAST2-Dev/starbeast2</url>
     </scm>
 
     <properties>
@@ -213,6 +226,74 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Assemble BEAST package ZIP -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/beast-package.xml</descriptor>
+                    </descriptors>
+                    <finalName>${beast.pkg.name}.v${version}</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>beast-package</id>
+                        <phase>package</phase>
+                        <goals><goal>single</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.11.2</version>
+                        <configuration>
+                            <doclint>none</doclint>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals><goal>jar</goal></goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.7</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals><goal>sign</goal></goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.11.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
