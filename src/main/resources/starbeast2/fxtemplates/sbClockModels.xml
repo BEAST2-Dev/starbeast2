@@ -141,9 +141,11 @@
 					<M id="rlcClockRatePriorMean.s:$(n)" value="1.0" estimate="false" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal"/>
 				</distribution>
 
-			<distribution id="branchRatePrior.c:$(n)" spec="beast.base.spec.inference.distribution.Gamma" param="@rlcBranchRates.c:$(n)">
+			<distribution id="branchRatePrior.c:$(n)" spec="beast.base.spec.inference.distribution.IID" param="@rlcBranchRates.c:$(n)">
+					<distr spec="beast.base.spec.inference.distribution.Gamma">
 					<parameter estimate="false" id="branchRatePriorAlpha.$(n)" name="alpha" value="0.5" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal"/>
 					<parameter estimate="false" id="branchRatePriorBeta.$(n)" name="theta" value="2.0" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal"/>
+					</distr>
 				</distribution>
 
 			<distribution id="indicatorSumPrior.c:$(n)" spec="beast.base.spec.inference.distribution.Poisson">

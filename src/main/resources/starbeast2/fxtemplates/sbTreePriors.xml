@@ -177,7 +177,7 @@
 			<operator id="samplingPScalerFBD.t:$(n)" scaleFactor="0.75" weight="10.0" parameter="@samplingProportionFBD.t:$(n)" spec="beast.base.spec.inference.operator.ScaleOperator"/>
 			<operator id="rhoScalerFBD.t:$(n)" scaleFactor="0.9" weight="1.0" parameter="@rhoFBD.t:$(n)" spec="beast.base.spec.inference.operator.ScaleOperator"/>
 
-			<plugin id="SACountFBD.t:$(n)" spec="beast.evolution.tree.SampledAncestorLogger" tree="@Tree.t:$(n)"/>
+			<plugin id="SACountFBD.t:$(n)" spec="sa.evolution.tree.SampledAncestorLogger" tree="@Tree.t:$(n)"/>
 
 			<!-- operators for sampled ancestor trees -->
 			<operator id="LeafToSAFBD.t:$(n)" spec="sa.evolution.operators.LeafToSampledAncestorJump" weight="10" tree="@Tree.t:$(n)"/>

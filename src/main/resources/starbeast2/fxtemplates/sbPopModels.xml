@@ -86,13 +86,17 @@
 				<parameter dimension="10" name="topPopulationSizes" id="topPopSizes.$(n)" value="1.0" estimate="true" spec="beast.base.spec.inference.parameter.RealVectorParam" domain="UnitInterval"/>
 			</plugin>
 
-			<distribution id="tipPopSizesPrior.$(n)" spec="beast.base.spec.inference.distribution.Gamma" param="@tipPopSizes.$(n)">
+			<distribution id="tipPopSizesPrior.$(n)" spec="beast.base.spec.inference.distribution.IID" param="@tipPopSizes.$(n)">
+					<distr spec="beast.base.spec.inference.distribution.Gamma">
 					<parameter name="alpha" id="tipPopShape.$(n)" value="4.0" estimate="false" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal"/>
 					<parameter name="theta" id="lwcrPopScale.$(n)" value="1.0" estimate="true" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal"/>
+					</distr>
 				</distribution>
 
-			<distribution id="topPopSizesPrior.$(n)" spec="beast.base.spec.inference.distribution.Gamma" param="@topPopSizes.$(n)" theta="@lwcrPopScale.$(n)">
+			<distribution id="topPopSizesPrior.$(n)" spec="beast.base.spec.inference.distribution.IID" param="@topPopSizes.$(n)">
+					<distr spec="beast.base.spec.inference.distribution.Gamma" theta="@lwcrPopScale.$(n)">
 					<parameter name="alpha" id="topPopShape.$(n)" value="2.0" estimate="false" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal"/>
+					</distr>
 				</distribution>
 
 			<distribution id="tipPopShapePrior.$(n)" spec="beast.base.spec.inference.distribution.Uniform" param="@tipPopShape.$(n)" lower="0.0" upper="10000.0"/>

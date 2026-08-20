@@ -7,15 +7,18 @@
 # manual jar paths, no separate ../beast3 build.
 #
 # Usage:
-#   bin/beast -validate path/to/file.xml
-#   bin/beast -overwrite path/to/file.xml
+#   bin/beast path/to/file.xml
+#   bin/beast -help
 
+# Finds the absolute path of the directory one level above where this script (bin/beast).
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 if [ "$#" -eq 0 ]; then
-    echo "Usage: $0 [-validate|-overwrite] path/to/file.xml" >&2
+    echo "Usage: $0 path/to/file.xml or $0 -help" >&2
     exit 1
 fi
 
+# Changes the current working directory to the project's root folder
 cd "$PROJECT_ROOT"
+# Compiles and runs beast using Maven, and pass a system property named beast.args to Java.
 exec mvn -q compile exec:exec -Dbeast.args="$*"

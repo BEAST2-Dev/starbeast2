@@ -33,11 +33,6 @@
         </dependencySet>
     </dependencySets>
 
-    <fileSets>
-        <!-- fxtemplates/ -->
-        <fileSet>
-            <directory>${project.basedir}/fxtemplates</directory>
-            <outputDirectory>/fxtemplates</outputDirectory>
-        </fileSet>
-    </fileSets>
+    <!-- fxtemplates/ inside jar now: bundled via src/main/resources/starbeast2/fxtemplates
+         (module-namespaced, matching beast-fx), so no separate zip copy is needed. -->
 </assembly>
