@@ -149,6 +149,7 @@
 				</distribution>
 
 			<distribution id="indicatorSumPrior.c:$(n)" spec="beast.base.spec.inference.distribution.Poisson">
+					<param id="indicatorSum.c:$(n)" spec="beast.base.spec.evolution.IntSum" arg="@indicators.c:$(n)"/>
 					<lambda estimate="false" value="0.6931471805599453" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
 				</distribution>
 

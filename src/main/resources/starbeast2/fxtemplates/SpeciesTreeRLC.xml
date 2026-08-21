@@ -273,6 +273,7 @@
 						</distr>
 					</distribution>
 				<distribution id="indicatorSumPrior.Species" spec="beast.base.spec.inference.distribution.Poisson">
+						<param id="indicatorSum.Species" spec="beast.base.spec.evolution.IntSum" arg="@indicators.Species"/>
 						<lambda estimate="false" value="0.6931471805599453" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
 					</distribution>
 				<mergepoint id="aux-priors"/>

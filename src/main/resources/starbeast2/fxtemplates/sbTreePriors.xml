@@ -75,7 +75,7 @@
 				Prior on birth (a.k.a. speciation) rate applied to a calibrated species tree
 			</connect><![CDATA[
 
-			]]><connect srcID="cySpeciationRateScaler.t:$(n)" targetID="mcmc" inputName="operator" if="inposterior(CalibratedYuleModel.t:$(n)) and cySpeciationRate.t:$(n)/estimate=true">
+			]]><connect srcID="cySpeciationRateScale.t:$(n)" targetID="mcmc" inputName="operator" if="inposterior(CalibratedYuleModel.t:$(n)) and cySpeciationRate.t:$(n)/estimate=true">
 				Scale the birth (a.k.a. speciation) rate of the calibrated species tree
 			</connect><![CDATA[
 

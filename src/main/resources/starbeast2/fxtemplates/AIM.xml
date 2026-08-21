@@ -258,7 +258,9 @@
 				<!-- <distribution id="migMeanPrior.Species" spec="beast.base.inference.distribution.Prior" x="@migMean.Species">
 					<distr spec="beast.base.inference.distribution.OneOnX"/>
 				</distribution> -->
-				<distribution id="migIndicatorSumPrior.Species" spec="beast.base.spec.inference.distribution.Poisson" lambda="0.693"/>
+				<distribution id="migIndicatorSumPrior.Species" spec="beast.base.spec.inference.distribution.Poisson" lambda="0.693">
+					<param id="migIndicatorSum.Species" spec="beast.base.spec.evolution.IntSum" arg="@migIndicators.Species"/>
+				</distribution>
 				<mergepoint id="aux-priors"/>
 			</distribution>
 			<distribution spec="CompoundDistribution" id="likelihood">
