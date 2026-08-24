@@ -69,7 +69,7 @@
 			</frequencies>
 		</plugin>
 
-		<plugin id="KappaScaler.s:$(n)" spec="ScaleOperator" scaleFactor="0.75" weight="1.0" parameter="@kappa.s:$(n)"/>
+		<plugin id="KappaScaler.s:$(n)" spec="beast.base.spec.inference.operator.ScaleOperator" scaleFactor="0.75" weight="1.0" parameter="@kappa.s:$(n)"/>
 		<plugin id="FrequenciesExchanger.s:$(n)" spec="beast.base.spec.inference.operator.DeltaExchangeOperator" delta="0.2" weight="1.5" parameter="@freqParameter.s:$(n)"/>
 
 		<distribution id="KappaPrior.s:$(n)" spec="beast.base.spec.inference.distribution.LogNormal" param="@kappa.s:$(n)" meanInRealSpace="false">
@@ -77,7 +77,7 @@
 				<parameter name="S" value="1.25" estimate="false" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
 			</distribution>
 <!--
-		<prior id="FrequenciesPrior.s:$(n)" x="@freqParameter.s:$(n)"><distr spec="beast.base.inference.distribution.Uniform" lower="0" upper="1"/></prior>
+		<prior id="FrequenciesPrior.s:$(n)" x="@freqParameter.s:$(n)"><distr spec="beast.base.spec.inference.distribution.Uniform" lower="0" upper="1"/></prior>
 -->
 
 
@@ -112,8 +112,8 @@
 			</frequencies>
 		</plugin>
 
-		<plugin id="kappa1Scaler.s:$(n)" spec="ScaleOperator" scaleFactor="0.75" weight="1.0" parameter="@kappa1.s:$(n)"/>
-		<plugin id="kappa2Scaler.s:$(n)" spec="ScaleOperator" scaleFactor="0.75" weight="1.0" parameter="@kappa2.s:$(n)"/>
+		<plugin id="kappa1Scaler.s:$(n)" spec="beast.base.spec.inference.operator.ScaleOperator" scaleFactor="0.75" weight="1.0" parameter="@kappa1.s:$(n)"/>
+		<plugin id="kappa2Scaler.s:$(n)" spec="beast.base.spec.inference.operator.ScaleOperator" scaleFactor="0.75" weight="1.0" parameter="@kappa2.s:$(n)"/>
 		<plugin id="FrequenciesExchanger.s:$(n)" spec="beast.base.spec.inference.operator.DeltaExchangeOperator" delta="0.2" weight="1.5" parameter="@freqParameter.s:$(n)"/>
 
 		<distribution id="kappa1Prior.s:$(n)" spec="beast.base.spec.inference.distribution.LogNormal" param="@kappa1.s:$(n)" meanInRealSpace="false">
@@ -125,7 +125,7 @@
 				<parameter name="S" value="1.25" estimate="false" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
 			</distribution>
 <!--
-		<prior id="FrequenciesPrior.s:$(n)" x="@freqParameter.s:$(n)"><distr spec="beast.base.inference.distribution.Uniform" lower="0" upper="1"/></prior>
+		<prior id="FrequenciesPrior.s:$(n)" x="@freqParameter.s:$(n)"><distr spec="beast.base.spec.inference.distribution.Uniform" lower="0" upper="1"/></prior>
 -->
 
 
@@ -160,7 +160,7 @@
 		]]></subtemplate>
 
 		<!-- GTR substitution model -->
-		<subtemplate id="GTR" class="beast.base.spec.evolution.substitutionmodel.GTR" mainid="gtr.s:$(n)" suppressInputs="beast.base.evolution.substitutionmodel.GTR.eigenSystem"><![CDATA[<plugin spec="beast.base.spec.evolution.substitutionmodel.GTR" id="gtr.s:$(n)">
+		<subtemplate id="GTR" class="beast.base.spec.evolution.substitutionmodel.GTR" mainid="gtr.s:$(n)" suppressInputs="beast.base.spec.evolution.substitutionmodel.GTR.eigenSystem"><![CDATA[<plugin spec="beast.base.spec.evolution.substitutionmodel.GTR" id="gtr.s:$(n)">
 				<parameter id="rateAC.s:$(n)" name="rateAC" value="1.0" estimate="true" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
 				<parameter id="rateAG.s:$(n)" name="rateAG" value="1.0" estimate="true" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
 				<parameter id="rateAT.s:$(n)" name="rateAT" value="1.0" estimate="true" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
@@ -247,21 +247,21 @@
 		]]></subtemplate>
 
 		<!-- empirical amino acid substitution models -->
-		<subtemplate id="Blosum62" class="beast.base.spec.evolution.substitutionmodel.Blosum62" suppressInputs="beast.base.evolution.substitutionmodel.Blosum62.eigenSystem" mainid="Blosum62.s:$(n)"><!--value spec="XML"--><![CDATA[
-			<plugin spec="Blosum62" id="Blosum62.s:$(n)"/>]]></subtemplate>
-		<subtemplate id="Dayhoff" class="beast.base.spec.evolution.substitutionmodel.Dayhoff" suppressInputs="beast.base.evolution.substitutionmodel.Dayhoff.eigenSystem" mainid="Dayhoff.s:$(n)"><!--value spec="XML"--><![CDATA[
-			<plugin spec="Dayhoff" id="Dayhoff.s:$(n)"/>]]></subtemplate>
-		<subtemplate id="JTT" class="beast.base.spec.evolution.substitutionmodel.JTT" suppressInputs="beast.base.evolution.substitutionmodel.JTT.eigenSystem" mainid="JTT.s:$(n)"><!--value spec="XML"--><![CDATA[
-			<plugin spec="JTT" id="JTT.s:$(n)"/>]]></subtemplate>
-		<subtemplate id="cpREV" class="beast.base.spec.evolution.substitutionmodel.CPREV" suppressInputs="beast.base.evolution.substitutionmodel.CPREV.eigenSystem" mainid="CPREV.s:$(n)"><!--value spec="XML"--><![CDATA[
-			<plugin spec="CPREV" id="CPREV.s:$(n)"/>]]></subtemplate>
-		<subtemplate id="mtREV" class="beast.base.spec.evolution.substitutionmodel.MTREV" suppressInputs="beast.base.evolution.substitutionmodel.MTREV.eigenSystem" mainid="MTREV.s:$(n)"><!--value spec="XML"--><![CDATA[
-			<plugin spec="MTREV" id="MTREV.s:$(n)"/>]]></subtemplate>
-		<subtemplate id="WAG" class="beast.base.spec.evolution.substitutionmodel.WAG" suppressInputs="beast.base.evolution.substitutionmodel.WAG.eigenSystem" mainid="WAG.s:$(n)"><!--value spec="XML"--><![CDATA[
-			<plugin spec="WAG" id="WAG.s:$(n)"/>]]></subtemplate>
+		<subtemplate id="Blosum62" class="beast.base.spec.evolution.substitutionmodel.Blosum62" suppressInputs="beast.base.spec.evolution.substitutionmodel.Blosum62.eigenSystem" mainid="Blosum62.s:$(n)"><!--value spec="XML"--><![CDATA[
+			<plugin spec="beast.base.spec.evolution.substitutionmodel.Blosum62" id="Blosum62.s:$(n)"/>]]></subtemplate>
+		<subtemplate id="Dayhoff" class="beast.base.spec.evolution.substitutionmodel.Dayhoff" suppressInputs="beast.base.spec.evolution.substitutionmodel.Dayhoff.eigenSystem" mainid="Dayhoff.s:$(n)"><!--value spec="XML"--><![CDATA[
+			<plugin spec="beast.base.spec.evolution.substitutionmodel.Dayhoff" id="Dayhoff.s:$(n)"/>]]></subtemplate>
+		<subtemplate id="JTT" class="beast.base.spec.evolution.substitutionmodel.JTT" suppressInputs="beast.base.spec.evolution.substitutionmodel.JTT.eigenSystem" mainid="JTT.s:$(n)"><!--value spec="XML"--><![CDATA[
+			<plugin spec="beast.base.spec.evolution.substitutionmodel.JTT" id="JTT.s:$(n)"/>]]></subtemplate>
+		<subtemplate id="cpREV" class="beast.base.spec.evolution.substitutionmodel.CPREV" suppressInputs="beast.base.spec.evolution.substitutionmodel.CPREV.eigenSystem" mainid="CPREV.s:$(n)"><!--value spec="XML"--><![CDATA[
+			<plugin spec="beast.base.spec.evolution.substitutionmodel.CPREV" id="CPREV.s:$(n)"/>]]></subtemplate>
+		<subtemplate id="mtREV" class="beast.base.spec.evolution.substitutionmodel.MTREV" suppressInputs="beast.base.spec.evolution.substitutionmodel.MTREV.eigenSystem" mainid="MTREV.s:$(n)"><!--value spec="XML"--><![CDATA[
+			<plugin spec="beast.base.spec.evolution.substitutionmodel.MTREV" id="MTREV.s:$(n)"/>]]></subtemplate>
+		<subtemplate id="WAG" class="beast.base.spec.evolution.substitutionmodel.WAG" suppressInputs="beast.base.spec.evolution.substitutionmodel.WAG.eigenSystem" mainid="WAG.s:$(n)"><!--value spec="XML"--><![CDATA[
+			<plugin spec="beast.base.spec.evolution.substitutionmodel.WAG" id="WAG.s:$(n)"/>]]></subtemplate>
 
 		<!-- binary model -->
-		<subtemplate id="MutationDeathModel" class="beast.base.spec.evolution.substitutionmodel.MutationDeathModel" mainid="MutationDeathModel.s:$(n)" suppressInputs="beast.base.evolution.substitutionmodel.MutationDeathModel.substmodel,beast.base.evolution.substitutionmodel.MutationDeathModel.frequencies"><![CDATA[<plugin id="MutationDeathModel.s:$(n)" spec="beast.base.spec.evolution.substitutionmodel.MutationDeathModel">
+		<subtemplate id="MutationDeathModel" class="beast.base.spec.evolution.substitutionmodel.MutationDeathModel" mainid="MutationDeathModel.s:$(n)" suppressInputs="beast.base.spec.evolution.substitutionmodel.MutationDeathModel.substmodel,beast.base.spec.evolution.substitutionmodel.MutationDeathModel.frequencies"><![CDATA[<plugin id="MutationDeathModel.s:$(n)" spec="beast.base.spec.evolution.substitutionmodel.MutationDeathModel">
 				<parameter name="deathprob" id="deathprob.s:$(n)" value="0.1" estimate="false" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
 				<frequencies id="freqs.s:$(n)" spec="beast.base.spec.evolution.substitutionmodel.Frequencies">
 					<frequencies value="1 0" spec="beast.base.spec.inference.parameter.SimplexParam"/>
