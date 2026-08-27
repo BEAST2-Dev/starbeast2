@@ -376,9 +376,11 @@
 						<S id="popMean.variance" value="0.25" estimate="false" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
 						</distr>
 					</distribution>
-				<distribution id="popMeanPrior.Species" spec="beast.base.spec.inference.distribution.LogNormal" param="@popMean.Species">
-					<M id="popMeanPriorMean.Species" value="3.0" estimate="false" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
-					<S id="popMeanPriorStdev.Species" value="2.5" estimate="false" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal"/>
+				<distribution id="popMeanPrior.Species" spec="beast.base.spec.inference.distribution.LogUniform" param="@popMean.Species">
+<!-- 1E-6 means that only one out of every million base pairs contains a mutation. -->
+					<lower id="popMeanPriorLower.Species" value="1.0E-6" estimate="false" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal"/>
+<!-- Biological Ceiling: 0.5 means on average 50% of the nucleotides at any given genetic site are completely different between two random individuals in the population -->
+					<upper id="popMeanPriorUpper.Species" value="0.5" estimate="false" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal"/>
 				</distribution>
 				<distribution id="migRatesPrior.Species" spec="beast.base.spec.inference.distribution.IID" param="@migRates.Species">
 						<distr spec="beast.base.spec.inference.distribution.LogNormal" meanInRealSpace="true">
