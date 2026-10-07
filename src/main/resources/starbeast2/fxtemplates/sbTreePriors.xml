@@ -128,7 +128,7 @@
 
 			<operator id="netDiversificationRateScale.t:$(n)" scaleFactor="0.5" weight="1.0" parameter="@netDiversificationRate.t:$(n)" spec="beast.base.spec.inference.operator.ScaleOperator"/>
 			<operator id="ExtinctionFractionScale.t:$(n)" parameter="@ExtinctionFraction.t:$(n)" scaleFactor="0.5" weight="0.5" spec="beast.base.spec.inference.operator.ScaleOperator"/>
-			<operator id="ExtinctionFractionUniform.t:$(n)" parameter="@ExtinctionFraction.t:$(n)" spec="beast.base.spec.inference.operator.uniform.IntUniformOperator" weight="0.5"/>
+			<operator id="ExtinctionFractionUniform.t:$(n)" parameter="@ExtinctionFraction.t:$(n)" spec="beast.base.spec.inference.operator.uniform.IntervalOperator" weight="0.5"/>
 ]]>
 <connect srcID="BirthDeathModel.t:$(n)" targetID="prior" inputName="distribution" if="inposterior(BirthDeathModel.t:$(n)) and inposterior(Tree.t:$(n)) and Tree.t:$(n)/estimate=true">
 				Birth-Death speciation prior applied to the species tree
